@@ -15,7 +15,6 @@ class Predict(object):
 
     def get_y(self, values):
         test_y = delete(values, s_[1:], 1)
-        test_y = delete(test_y, 0)
         return test_y
     
     def load_model(self):
@@ -37,7 +36,7 @@ class Predict(object):
         self.trainModel.db.insert_history_prediction(id_coin, time_create, price_actual, price_predict, 
             price_preidct_last, price_predict_previous, price_actual_last, price_actual_previous)
 
-    def make_predict_multiple_coin(self, coin):
+    def make_predict_price_coin(self, coin):
         dataset = self.trainModel.db.get_data_predict_by_id(coin[self.ID_COIN])
         inv_y = self.get_y(dataset.values)
         n_features = len(dataset.columns)
@@ -54,4 +53,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     coin = [args.symbol, args.id]
     predict = Predict()
-    predict.make_predict_multiple_coin(coin)
+    predict.make_predict_price_coin(coin)
