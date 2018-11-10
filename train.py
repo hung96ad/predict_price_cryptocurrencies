@@ -61,14 +61,14 @@ class trainModel(object):
         pyplot.savefig("img/chart_%s.png"%symbol)
         pyplot.close()
 
-    def make_predict(self, model, test_X, n_hours = 1, n_features = 1):
+    def make_predict(self, model, test_X, n_features = 1):
         yhat = model.predict(test_X)
-        test_X = test_X.reshape((test_X.shape[0], n_hours*n_features))
+        test_X = test_X.reshape((test_X.shape[0], self.n_hours*n_features))
         inv_yhat = self.invert_scaling(yhat, test_X, n_features)
         return inv_yhat
     
     def make_actual(self, model, test_X, test_y, n_features = 1):
-        test_X = test_X.reshape((test_X.shape[0], n_hours*n_features))
+        test_X = test_X.reshape((test_X.shape[0], self.n_hours*n_features))
         test_y = test_y.reshape((len(test_y), 1))
         inv_y = self.invert_scaling(test_y, test_X, n_features)
         return inv_y
@@ -79,11 +79,11 @@ class trainModel(object):
         inv_y = inv_y[:,0]
         return inv_y
 
-    def normalize_data(self, dataset, n_hours = 1, dropnan=True):
+    def normalize_data(self, dataset, dropnan=True):
         values = dataset.values
         values = values.astype('float32')
         scaled = self.scaler.fit_transform(values)
-        reframed = self.series_to_supervised(scaled, n_hours, 1, dropnan)
+        reframed = self.series_to_supervised(scaled, self.n_hours, 1, dropnan)
         values = reframed.values
         return values
 
@@ -102,11 +102,11 @@ class trainModel(object):
         test = values[n_train_hours:, :]
         return train, test
 
-    def split_into_inputs_and_outputs(self, values, n_features = 10, n_hours = 1):
+    def split_into_inputs_and_outputs(self, values, n_features = 10):
         n_time_predicts = len(values)
-        n_obs = n_hours * n_features
+        n_obs = self.n_hours * n_features
         test_X, test_y = values[:, :n_obs], values[:, -n_features]
-        test_X = test_X.reshape((n_time_predicts, n_hours, n_features))
+        test_X = test_X.reshape((n_time_predicts, self.n_hours, n_features))
         return test_X, test_y
 
     def fit_model(self, model, train_X, train_y, test_X, test_y, symbol, config):
@@ -133,14 +133,14 @@ class trainModel(object):
     def train_model(self):
         dataset = self.db.get_data_train_by_id(coin[self.ID_COIN])
         n_features = len(dataset.columns)
-        values = self.normalize_data(dataset, self.n_hours)
+        values = self.normalize_data(dataset)
         train, test = self.split_train_test(values, self.n_time_predicts)
-        train_X, train_y = self.split_into_inputs_and_outputs(train, self.n_hours, n_features)
-        test_X, test_y = self.split_into_inputs_and_outputs(test, self.n_hours, n_features)
+        train_X, train_y = self.split_into_inputs_and_outputs(train, n_features=n_features)
+        test_X, test_y = self.split_into_inputs_and_outputs(test, n_features=n_features)
         model = self.build_model(units=self.units, train_X = train_X)
         model = self.fit_model(model, train_X, train_y, test_X, test_y, coin[self.SYMBOL], self.config_train)
         self.save_model(model, coin[self.SYMBOL])
-        inv_yhat = self.make_predict(model, test_X, self.n_hours, n_features)
+        inv_yhat = self.make_predict(model, test_X, n_features)
         inv_y = self.make_actual(model, test_X, test_y, n_features)
         inv_yhat = inv_yhat[:-1]
         inv_y = inv_y[1:]

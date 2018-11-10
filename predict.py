@@ -11,7 +11,7 @@ class Predict(object):
     ID_COIN = 1
 
     def __init__(self):
-        self.trainModel = trainModel()
+        self.trainModel = trainModel(n_hours=1)
 
     def get_y(self, values):
         test_y = delete(values, s_[1:], 1)
