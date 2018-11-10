@@ -18,8 +18,8 @@ class Predict(object):
         self.n_hours = 1
 
     def get_y(self, values):
-        test_y = delete(values, s_[1:], 1)
-        return test_y
+        y = delete(values, s_[1:], 1).reshape(-1)
+        return y
     
     def load_model(self):
         json_file = open('models/model_%s.json'%coin[self.SYMBOL], 'r')
