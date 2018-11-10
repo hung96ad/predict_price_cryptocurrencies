@@ -1,20 +1,26 @@
 from numpy import array2string
 from numpy import delete
 from numpy import s_
-from train import trainModel
+from connectDB import ConnectDB
 import time
 from keras.models import model_from_json
 import argparse
+from matplotlib import pyplot
+from sklearn.preprocessing import MinMaxScaler
+from numpy import concatenate
 
 class Predict(object):
     SYMBOL = 0
     ID_COIN = 1
 
     def __init__(self):
-        self.trainModel = trainModel(n_hours=1)
+        self.db = ConnectDB()
+        self.scaler = MinMaxScaler(feature_range=(0, 1))
+        self.n_hours = 1
 
     def get_y(self, values):
         test_y = delete(values, s_[1:], 1)
+        test_y = delete(test_y, 0)
         return test_y
     
     def load_model(self):
@@ -33,17 +39,36 @@ class Predict(object):
         price_predict_previous = inv_yhat[-2]
         price_actual_last = inv_y[-1]
         price_actual_previous = inv_y[-2]
-        self.trainModel.db.insert_history_prediction(id_coin, time_create, price_actual, price_predict, 
+        self.db.insert_history_prediction(id_coin, time_create, price_actual, price_predict, 
             price_preidct_last, price_predict_previous, price_actual_last, price_actual_previous)
 
+    def normalize_data(self, dataset, n_time_predicts=1, n_features=1, dropnan=True):
+        values = dataset.values
+        values = values.astype('float32')
+        values = self.scaler.fit_transform(values)
+        values = values.reshape((n_time_predicts, 1, n_features))
+        return values
+
+    def make_predict(self, model, test_X, n_features = 1):
+        yhat = model.predict(test_X)
+        test_X = test_X.reshape((test_X.shape[0], self.n_hours*n_features))
+        inv_yhat = self.invert_scaling(yhat, test_X, n_features)
+        return inv_yhat
+
+    def invert_scaling(self, test_y, test_X_reshape, n_features):
+        inv_y = concatenate((test_y, test_X_reshape[:, -(n_features - 1):]), axis=1)
+        inv_y = self.scaler.inverse_transform(inv_y)
+        inv_y = inv_y[:,0]
+        return inv_y
+
     def make_predict_price_coin(self, coin):
-        dataset = self.trainModel.db.get_data_predict_by_id(coin[self.ID_COIN])
+        dataset = self.db.get_data_predict_by_id(coin[self.ID_COIN])
         inv_y = self.get_y(dataset.values)
         n_features = len(dataset.columns)
-        values = self.trainModel.normalize_data(dataset, dropnan=False)
-        test_X, test_y = self.trainModel.split_into_inputs_and_outputs(values,n_features=n_features)
+        n_time_predicts = len(dataset)
+        test_X = self.normalize_data(dataset, n_time_predicts=n_time_predicts, n_features=n_features)
         model = self.load_model()
-        inv_yhat = self.trainModel.make_predict(model, test_X, n_features=n_features)
+        inv_yhat = self.make_predict(model, test_X, n_features=n_features)
         self.save_to_db(inv_yhat, inv_y, coin[self.ID_COIN])
 
 if __name__ == '__main__':
