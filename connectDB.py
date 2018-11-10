@@ -8,8 +8,7 @@ from config_db import config_db
 class ConnectDB(object):                 
     def get_data_train_by_id(self, id_coin):
         cnx = config_db()
-        query_string = "SELECT c.openTime,\
-                c.`close`,\
+        query_string = "SELECT c.`close`,\
                 c.high,\
                 c.low,\
                 c.`open`,\
@@ -21,15 +20,14 @@ class ConnectDB(object):
                 c.`ignore`\
             FROM candlestick_data AS c\
             WHERE c.idCoin = %s"%(id_coin)
-        history = read_sql(query_string, con=cnx, index_col="openTime")
+        history = read_sql(query_string, con=cnx)
         cnx.close()
         del cnx
         return history
 
     def get_data_predict_by_id(self, id_coin):
         cnx = config_db()
-        query_string = "SELECT c.openTime,\
-                c.`close`,\
+        query_string = "SELECT c.`close`,\
                 c.high,\
                 c.low,\
                 c.`open`,\
@@ -48,26 +46,24 @@ class ConnectDB(object):
                 ON c.idCoin = %s \
                 AND h.id_coin = c.idCoin \
                 AND c.openTime > h.openTime_last"%(id_coin)
-        history = read_sql(query_string, con=cnx, index_col="openTime")
+        history = read_sql(query_string, con=cnx)
         cnx.close()
         del cnx
         return history
     
     def get_data_train_univariate_by_id(self, id_coin):
         cnx = config_db()
-        query_string = "SELECT c.openTime,\
-                c.`close`\
+        query_string = "SELECT c.`close`\
             FROM candlestick_data AS c\
             WHERE c.idCoin = %s"%(id_coin)
-        history = read_sql(query_string, con=cnx, index_col="openTime")
+        history = read_sql(query_string, con=cnx)
         cnx.close()
         del cnx
         return history
 
     def get_data_predict_univariate_by_id(self, id_coin):
         cnx = config_db()
-        query_string = "SELECT c.openTime,\
-                c.`close`\
+        query_string = "SELECT c.`close`\
             FROM candlestick_data AS c \
             JOIN (SELECT MAX(h.openTime_last) openTime_last, \
                         h.id_coin \
@@ -77,7 +73,7 @@ class ConnectDB(object):
                 ON c.idCoin = %s \
                 AND h.id_coin = c.idCoin \
                 AND c.openTime > h.openTime_last"%(id_coin)
-        history = read_sql(query_string, con=cnx, index_col="openTime")
+        history = read_sql(query_string, con=cnx)
         cnx.close()
         del cnx
         return history

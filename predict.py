@@ -1,13 +1,12 @@
 from numpy import array2string
 from numpy import delete
 from numpy import s_
-from connectDB import ConnectDB
-import time
-from keras.models import model_from_json
-import argparse
-from matplotlib import pyplot
-from sklearn.preprocessing import MinMaxScaler
 from numpy import concatenate
+from keras.models import model_from_json
+from sklearn.preprocessing import MinMaxScaler
+from connectDB import ConnectDB
+import argparse
+import time
 
 class Predict(object):
     SYMBOL = 0
