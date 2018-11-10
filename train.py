@@ -81,12 +81,11 @@ class trainModel(object):
 
     def normalize_data(self, dataset, n_hours = 1, dropnan=True):
         values = dataset.values
-        n_features = len(dataset.columns)
         values = values.astype('float32')
         scaled = self.scaler.fit_transform(values)
         reframed = self.series_to_supervised(scaled, n_hours, 1, dropnan)
         values = reframed.values
-        return values, n_features
+        return values
 
     def evaluate_model(self, inv_y, inv_yhat):
         max_error = 0
@@ -133,7 +132,8 @@ class trainModel(object):
 
     def train_model(self):
         dataset = self.db.get_data_train_by_id(coin[self.ID_COIN])
-        values, n_features = self.normalize_data(dataset, self.n_hours)
+        n_features = len(dataset.columns)
+        values = self.normalize_data(dataset, self.n_hours)
         train, test = self.split_train_test(values, self.n_time_predicts)
         train_X, train_y = self.split_into_inputs_and_outputs(train, self.n_hours, n_features)
         test_X, test_y = self.split_into_inputs_and_outputs(test, self.n_hours, n_features)

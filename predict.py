@@ -40,7 +40,8 @@ class Predict(object):
     def make_predict_multiple_coin(self, coin):
         dataset = self.trainModel.db.get_data_predict_by_id(coin[self.ID_COIN])
         inv_y = self.get_y(dataset.values)
-        values, n_features = self.trainModel.normalize_data(dataset, dropnan=False)
+        n_features = len(dataset.columns)
+        values = self.trainModel.normalize_data(dataset, dropnan=False)
         test_X, test_y = self.trainModel.split_into_inputs_and_outputs(values,n_features=n_features)
         model = self.load_model()
         inv_yhat = self.trainModel.make_predict(model, test_X, n_features=n_features)
