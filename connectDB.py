@@ -1,5 +1,10 @@
+try:
+    import mysql.connector as mysql
+except :
+    import MySQLdb  as mysql
 from pandas import read_sql
 from config_db import config_db
+
 class ConnectDB(object):                 
     def get_data_train_by_id(self, id_coin):
         cnx = config_db()
