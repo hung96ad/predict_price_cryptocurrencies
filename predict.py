@@ -19,7 +19,6 @@ class Predict(object):
 
     def get_y(self, values):
         test_y = delete(values, s_[1:], 1)
-        test_y = delete(test_y, 0)
         return test_y
     
     def load_model(self):
