@@ -26,7 +26,7 @@ class crawlerDataBinance(object):
     def insert_coin_info_to_db(self):
         cnx = config_db()
         cursor = cnx.cursor()
-        coin_info = get_coin_info_from_binance(self)
+        coin_info = self.get_coin_info_from_binance()
         try:
             query_string = "INSERT INTO coin_info(symbol, minQty, tickSize, status, baseAsset, quoteAsset) VALUES (%s,%s,%s,%s,%s,%s)"
             cursor.executemany(query_string,  coin_info)
@@ -94,9 +94,9 @@ class crawlerDataBinance(object):
             del klines
 
 if __name__ == '__main__':
-    # insert_coin_info_to_db() # run first time
     time.strftime('%X %x')
     start_time = time.time()
     crawler = crawlerDataBinance()
+    crawler.insert_coin_info_to_db() # run first time
     crawler.insert_symbols_candlestick_data()
     print("Total time get data: %f"%(time.time() - start_time))
