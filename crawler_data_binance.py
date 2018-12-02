@@ -3,7 +3,11 @@ import numpy as np
 from decimal import *
 import time
 from config_db import config_db
-
+try:
+    import mysql.connector as mysql
+except :
+    import MySQLdb  as mysql
+    
 class crawlerDataBinance(object):
     COIN_INFO_IDCOIN = 0
     COIN_INFO_SYMBOL = 1
