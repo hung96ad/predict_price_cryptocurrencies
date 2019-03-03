@@ -16,7 +16,10 @@ if __name__ == '__main__':
     list_coin = DB.get_list_coin_info("ETH")
     for coin in list_coin:
         print(coin)
-        p = Popen('python3 predict.py -id %s -symbol %s'%(coin[1], coin[0]), shell=True, 
-             stdout=PIPE, stderr=STDOUT)
-        retval = p.wait()
+        try:
+            p = Popen('python3 predict.py -id %s -symbol %s'%(coin[1], coin[0]), shell=True, 
+                stdout=PIPE, stderr=STDOUT)
+            retval = p.wait()
+        except Exception as e:
+            print(e)
     print("Total time predict: %f" %(time.time() - start_time))

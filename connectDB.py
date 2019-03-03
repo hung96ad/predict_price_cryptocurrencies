@@ -98,8 +98,7 @@ class ConnectDB(object):
         query_string = "SELECT c.symbol, \
                 c.id \
             FROM coin_info c \
-            WHERE c.`status` = 'TRADING' \
-                AND c.quoteAsset = '%s'"%quoteAsset
+            WHERE c.`status` = 'TRADING'"
         cursor.execute(query_string)
         coins_info = cursor.fetchall()
         cursor.close()
