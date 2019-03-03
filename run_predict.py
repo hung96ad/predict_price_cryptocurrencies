@@ -7,6 +7,7 @@ if __name__ == '__main__':
     start_time = time.time()
     # get data from Binance
     crawler = crawlerDataBinance()
+    crawler.insert_coin_info_to_db()
     crawler.insert_symbols_candlestick_data()
     print("Total time get data: %f"%(time.time() - start_time))
     start_time = time.time()
