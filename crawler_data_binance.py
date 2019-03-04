@@ -31,13 +31,14 @@ class crawlerDataBinance(object):
         cnx = config_db()
         cursor = cnx.cursor()
         coin_info = self.get_coin_info_from_binance()
-        try:
-            query_string = "INSERT INTO coin_info(symbol, minQty, tickSize, status, baseAsset, quoteAsset) VALUES (%s,%s,%s,%s,%s,%s)"
-            cursor.executemany(query_string,  coin_info)
-            cnx.commit()
-        except mysql.Error as err:
-            cnx.rollback()
-            print("Something went wrong: {}".format(err))
+        for coin in coin_info:
+            try:
+                query_string = "INSERT INTO coin_info(symbol, minQty, tickSize, status, baseAsset, quoteAsset) VALUES (%s,%s,%s,%s,%s,%s)"
+                cursor.execute(query_string,  coin)
+                cnx.commit()
+            except mysql.Error as err:
+                cnx.rollback()
+                print("Something went wrong: {}".format(err))
         cursor.close()
         cnx.close()
         del coin_info
