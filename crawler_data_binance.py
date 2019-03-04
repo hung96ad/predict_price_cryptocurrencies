@@ -23,7 +23,7 @@ class crawlerDataBinance(object):
         market = []
         symbols  = self.client.get_exchange_info()['symbols']
         for symbol in symbols:
-            temp = [symbol["symbol"], symbol["filters"][1]["minQty"], symbol["filters"][0]["tickSize"], symbol["status"], symbol["baseAsset"], symbol["quoteAsset"]]
+            temp = [symbol["symbol"], symbol["filters"][2]["minQty"], symbol["filters"][0]["tickSize"], symbol["status"], symbol["baseAsset"], symbol["quoteAsset"]]
             market.append(temp)
         return market
 
